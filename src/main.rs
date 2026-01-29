@@ -342,7 +342,33 @@ fn main() -> Result<(), eframe::Error> {
     eframe::run_native(
         "webrtc-egui",
         options,
-        Box::new(|_cc| Ok(Box::new(WebRtcApp::default()))),
+        Box::new(|cc| {
+            // IBM Plex Sans JP フォントを読み込んで設定
+            let mut fonts = egui::FontDefinitions::default();
+
+            // フォントデータを追加
+            fonts.font_data.insert(
+                "ibm_plex_sans_jp".to_owned(),
+                egui::FontData::from_static(include_bytes!("../fonts/IBMPlexSansJP-Regular.ttf")).into(),
+            );
+
+            // Proportional（プロポーショナル）フォントとして設定（優先度最高）
+            fonts.families
+                .entry(egui::FontFamily::Proportional)
+                .or_default()
+                .insert(0, "ibm_plex_sans_jp".to_owned());
+
+            // Monospace（等幅）フォントとしても設定
+            fonts.families
+                .entry(egui::FontFamily::Monospace)
+                .or_default()
+                .insert(0, "ibm_plex_sans_jp".to_owned());
+
+            // フォント設定を適用
+            cc.egui_ctx.set_fonts(fonts);
+
+            Ok(Box::new(WebRtcApp::default()))
+        }),
     )
 }
 
